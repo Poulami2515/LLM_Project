@@ -67,7 +67,7 @@ def save_data(items: List[dict]):
 
 
 # ---------- LLM Helpers ----------
-def generate_ai_analysis(rating: int, review: str):
+''' def generate_ai_analysis(rating: int, review: str):
     """
     Calls the LLM once and asks it to produce:
     - short summary for admin
@@ -113,7 +113,51 @@ Return:
         data.get("summary", "").strip(),
         data.get("recommended_actions", "").strip(),
         data.get("user_response", "").strip(),
+    )'''
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def generate_ai_analysis(rating: int, review: str):
+    system_msg = (
+        "You are an assistant helping a product team process user feedback. "
+        "Respond ONLY in JSON with keys: summary, recommended_actions, user_response."
     )
+
+    user_msg = f"""
+User rating: {rating}
+Review: {review}
+
+Return:
+- 'summary': 1–2 sentence summary
+- 'recommended_actions': bullet list
+- 'user_response': friendly reply
+"""
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": user_msg},
+            ],
+            temperature=0.7,
+        )
+
+        content = response["choices"][0]["message"]["content"]
+        data = json.loads(content)
+
+        return (
+            data.get("summary", ""),
+            data.get("recommended_actions", ""),
+            data.get("user_response", ""),
+        )
+    except Exception as e:
+        print("LLM Error:", e)
+        return (
+            "AI summary unavailable due to an error.",
+            "Check the logs for LLM error and retry.",
+            "Thanks for your feedback! Sorry — our AI couldn't respond properly this time.",
+        )
 
 
 # ---------- Routes: Dashboards ----------
