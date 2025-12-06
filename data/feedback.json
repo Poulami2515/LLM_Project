@@ -1,0 +1,29 @@
+[
+  {
+    "id": "48ff4b45-55d4-4c19-9593-51cf62976b6a",
+    "timestamp": "2025-12-06T13:48:56.846169Z",
+    "rating": 4,
+    "review": "The ambience was great. Service could have been better.",
+    "ai_summary": "AI summary unavailable due to an error.",
+    "ai_recommended_actions": "Check the logs for LLM error and retry.",
+    "ai_user_response": "Thanks for your feedback! There was a small glitch generating a detailed response, but we truly appreciate your time."
+  },
+  {
+    "id": "a0b3a006-3f44-47d9-9356-71f6e5136dbe",
+    "timestamp": "2025-12-06T13:53:43.705527Z",
+    "rating": 4,
+    "review": "The ambience was great. Service could have been better.",
+    "ai_summary": "AI summary unavailable due to an error.",
+    "ai_recommended_actions": "Check the logs for LLM error and retry.",
+    "ai_user_response": "Thanks for your feedback! There was a small glitch generating a detailed response, but we truly appreciate your time."
+  },
+  {
+    "id": "29edf71f-500f-4aad-bb74-e5258112f7af",
+    "timestamp": "2025-12-06T13:54:39.600363Z",
+    "rating": 5,
+    "review": "great",
+    "ai_summary": "AI summary unavailable due to an error.",
+    "ai_recommended_actions": "Check the logs for LLM error and retry.",
+    "ai_user_response": "Thanks for your feedback! There was a small glitch generating a detailed response, but we truly appreciate your time."
+  }
+]
