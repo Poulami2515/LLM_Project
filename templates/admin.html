@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard – Feedback</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #020617;
+      color: #e5e7eb;
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 260px;
+      background: #020617;
+      border-right: 1px solid #111827;
+      padding: 1.5rem 1rem;
+    }
+    .main {
+      flex: 1;
+      padding: 1.5rem;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin: 0;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .metric-grid {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .metric {
+      padding: 0.75rem;
+      background: #020617;
+      border-radius: 0.75rem;
+      border: 1px solid #111827;
+    }
+    .metric-label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    .metric-value {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+    .rating-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    .rating-bar-outer {
+      width: 100%;
+      height: 6px;
+      background: #020617;
+      border-radius: 999px;
+      margin-top: 0.25rem;
+      border: 1px solid #111827;
+      overflow: hidden;
+    }
+    .rating-bar-inner {
+      height: 100%;
+      background: #38bdf8;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #111827;
+      vertical-align: top;
+    }
+    th {
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .tag {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #1e293b;
+      color: #a5b4fc;
+      margin-right: 0.25rem;
+    }
+    .pill {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #9ca3af;
+    }
+    .table-wrapper {
+      max-height: 70vh;
+      overflow-y: auto;
+      border-radius: 0.75rem;
+      border: 1px solid #111827;
+      background: #020617;
+    }
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: #22c55e;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .small {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h1>Admin</h1>
+    <p class="small" style="margin-top:0.5rem;">
+      Live stream of user feedback with AI summaries and recommended actions.
+    </p>
+
+    <div style="margin-top:1.5rem;">
+      <div class="badge-live"><span class="dot"></span> Live updating</div>
+      <p class="small" style="margin-top:0.5rem;">
+        Data refreshes every 10 seconds from the shared store.
+      </p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top-nav">
+      <h2>Feedback Overview</h2>
+      <span class="small" id="lastUpdated">Last updated: –</span>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="metric-label">Total Submissions</div>
+        <div class="metric-value" id="totalCount">0</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Average Rating</div>
+        <div class="metric-value" id="avgRating">–</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Rating Distribution</div>
+        <div style="margin-top:0.5rem;">
+          <!-- 5 to 1 -->
+          <div class="rating-row">
+            <span>5 ★</span><span id="count5">0</span>
+          </div>
+          <div class="rating-bar-outer">
+            <div class="rating-bar-inner" id="bar5"></div>
+          </div>
+
+          <div class="rating-row">
+            <span>4 ★</span><span id="count4">0</span>
+          </div>
+          <div class="rating-bar-outer">
+            <div class="rating-bar-inner" id="bar4"></div>
+          </div>
+
+          <div class="rating-row">
+            <span>3 ★</span><span id="count3">0</span>
+          </div>
+          <div class="rating-bar-outer">
+            <div class="rating-bar-inner" id="bar3"></div>
+          </div>
+
+          <div class="rating-row">
+            <span>2 ★</span><span id="count2">0</span>
+          </div>
+          <div class="rating-bar-outer">
+            <div class="rating-bar-inner" id="bar2"></div>
+          </div>
+
+          <div class="rating-row">
+            <span>1 ★</span><span id="count1">0</span>
+          </div>
+          <div class="rating-bar-outer">
+            <div class="rating-bar-inner" id="bar1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:1.5rem;">All Submissions</h2>
+    <p class="small">Newest at the top. Each row shows raw review, AI summary, and recommended actions.</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Time (UTC)</th>
+            <th>Rating</th>
+            <th>Review</th>
+            <th>AI Summary</th>
+            <th>AI Recommended Actions</th>
+          </tr>
+        </thead>
+        <tbody id="feedbackBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = ""; // same origin; change if separate
+
+    const totalCountEl = document.getElementById("totalCount");
+    const avgRatingEl = document.getElementById("avgRating");
+    const lastUpdatedEl = document.getElementById("lastUpdated");
+
+    const counts = {
+      1: document.getElementById("count1"),
+      2: document.getElementById("count2"),
+      3: document.getElementById("count3"),
+      4: document.getElementById("count4"),
+      5: document.getElementById("count5"),
+    };
+    const bars = {
+      1: document.getElementById("bar1"),
+      2: document.getElementById("bar2"),
+      3: document.getElementById("bar3"),
+      4: document.getElementById("bar4"),
+      5: document.getElementById("bar5"),
+    };
+
+    const feedbackBody = document.getElementById("feedbackBody");
+
+    function fmtDate(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toISOString().replace("T", " ").replace("Z", "Z");
+      } catch {
+        return iso;
+      }
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/[&<>"']/g, function (m) {
+        return ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[m];
+      });
+    }
+
+    function renderTable(items) {
+      feedbackBody.innerHTML = "";
+      const sorted = [...items].sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""));
+
+      for (const item of sorted) {
+        const tr = document.createElement("tr");
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = fmtDate(item.timestamp);
+
+        const tdRating = document.createElement("td");
+        tdRating.innerHTML = `<span class="pill">${item.rating} ★</span>`;
+
+        const tdReview = document.createElement("td");
+        tdReview.textContent = item.review || "";
+
+        const tdSummary = document.createElement("td");
+        tdSummary.textContent = item.ai_summary || "";
+
+        const tdActions = document.createElement("td");
+        // show bullet-style actions even if it's text
+        const actions = (item.ai_recommended_actions || "").split(/\n|•|-/).map(s => s.trim()).filter(Boolean);
+        if (actions.length) {
+          const ul = document.createElement("ul");
+          actions.forEach(a => {
+            const li = document.createElement("li");
+            li.textContent = a;
+            ul.appendChild(li);
+          });
+          tdActions.appendChild(ul);
+        } else {
+          tdActions.textContent = item.ai_recommended_actions || "";
+        }
+
+        tr.appendChild(tdTime);
+        tr.appendChild(tdRating);
+        tr.appendChild(tdReview);
+        tr.appendChild(tdSummary);
+        tr.appendChild(tdActions);
+
+        feedbackBody.appendChild(tr);
+      }
+    }
+
+    function renderMetrics(items) {
+      const total = items.length;
+      totalCountEl.textContent = total;
+
+      if (!total) {
+        avgRatingEl.textContent = "–";
+        Object.values(counts).forEach(el => (el.textContent = "0"));
+        Object.values(bars).forEach(el => (el.style.width = "0%"));
+        return;
+      }
+
+      let sum = 0;
+      const ratingCounts = { 1:0, 2:0, 3:0, 4:0, 5:0 };
+      for (const item of items) {
+        const r = item.rating || 0;
+        if (ratingCounts[r] !== undefined) {
+          ratingCounts[r] += 1;
+          sum += r;
+        }
+      }
+
+      const avg = sum / total;
+      avgRatingEl.textContent = avg.toFixed(2);
+
+      const maxCount = Math.max(...Object.values(ratingCounts), 1);
+
+      for (let r = 1; r <= 5; r++) {
+        counts[r].textContent = ratingCounts[r];
+        const pct = (ratingCounts[r] / maxCount) * 100;
+        bars[r].style.width = pct + "%";
+      }
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch(API_BASE + "/api/feedback");
+        const data = await res.json();
+        renderTable(data);
+        renderMetrics(data);
+        lastUpdatedEl.textContent = "Last updated: " + new Date().toLocaleTimeString();
+      } catch (err) {
+        console.error("Failed to fetch feedback", err);
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 10000); // 10s polling
+  </script>
+</body>
+</html>

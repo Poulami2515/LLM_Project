@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Feedback</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      margin: 2rem;
+      padding: 2rem;
+      background: #020617;
+      border-radius: 1rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      border: 1px solid #1f2937;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      color: #9ca3af;
+      margin-bottom: 1.5rem;
+    }
+    .stars {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .star {
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .star:hover {
+      transform: scale(1.1);
+    }
+    .star.selected {
+      color: #facc15;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px #38bdf8;
+    }
+    button {
+      background: #38bdf8;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      color: #0f172a;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .response-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      background: #020617;
+      border: 1px solid #1f2937;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #1e293b;
+      color: #a5b4fc;
+      margin-bottom: 0.5rem;
+    }
+    .small {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Drop Your Feedback ⭐</h1>
+    <p>Rate your experience and write a quick review. Our AI will read it and respond to you instantly.</p>
+
+    <div>
+      <label>How many stars would you give us?</label>
+      <div class="stars" id="starContainer">
+        <!-- stars injected by JS -->
+      </div>
+    </div>
+
+    <div>
+      <label for="review">Say a few words about your experience</label>
+      <textarea id="review" placeholder="What went well? What felt off? Tell us everything."></textarea>
+    </div>
+
+    <button id="submitBtn">
+      <span id="btnText">Submit Feedback</span>
+      <span id="btnSpinner" style="display:none;">⏳</span>
+    </button>
+
+    <div id="responseBox" class="response-box" style="display:none;">
+      <div class="badge">AI Reply</div>
+      <div id="responseText"></div>
+      <p class="small">Thanks for sharing your thoughts. Your review helps shape what we build next.</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = ""; // if backend is same origin; if not, put full URL like "https://your-app.onrender.com"
+
+    const starContainer = document.getElementById("starContainer");
+    const reviewInput = document.getElementById("review");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const responseBox = document.getElementById("responseBox");
+    const responseText = document.getElementById("responseText");
+
+    let selectedRating = 0;
+
+    // Render stars
+    for (let i = 1; i <= 5; i++) {
+      const span = document.createElement("span");
+      span.textContent = "★";
+      span.classList.add("star");
+      span.dataset.value = i;
+      span.addEventListener("click", () => {
+        selectedRating = i;
+        updateStars();
+      });
+      starContainer.appendChild(span);
+    }
+
+    function updateStars() {
+      document.querySelectorAll(".star").forEach(star => {
+        const val = parseInt(star.dataset.value);
+        if (val <= selectedRating) {
+          star.classList.add("selected");
+        } else {
+          star.classList.remove("selected");
+        }
+      });
+    }
+
+    async function submitFeedback() {
+      const review = reviewInput.value.trim();
+      if (!selectedRating) {
+        alert("Please select a star rating.");
+        return;
+      }
+      if (!review) {
+        alert("Please write a short review.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.textContent = "Sending...";
+      btnSpinner.style.display = "inline";
+
+      try {
+        const res = await fetch(API_BASE + "/api/feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rating: selectedRating,
+            review: review,
+          }),
+        });
+
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.error || "Unexpected error");
+        }
+
+        responseText.textContent = data.user_response;
+        responseBox.style.display = "block";
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong while sending your feedback. Try again in a bit.");
+      } finally {
+        submitBtn.disabled = false;
+        btnText.textContent = "Submit Feedback";
+        btnSpinner.style.display = "none";
+      }
+    }
+
+    submitBtn.addEventListener("click", submitFeedback);
+  </script>
+</body>
+</html>
