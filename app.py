@@ -12,8 +12,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
-
-from openai import OpenAI
+import openai
+#from openai import OpenAI
 
 # ---------- Config ----------
 DATA_DIR = Path("data")
