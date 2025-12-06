@@ -22,7 +22,7 @@ DATA_FILE = DATA_DIR / "feedback.json"
 
 OPENAI_MODEL = "gpt-4.1-mini"  # or gpt-4.1, etc.
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+#client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI(title="Two-Dashboard AI Feedback System")
 
