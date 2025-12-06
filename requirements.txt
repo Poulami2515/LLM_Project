@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+jinja2
+openai>=1.0.0
+python-multipart
